@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Eldy — Eldoret Inspired Fine Dining</title>
+<meta name="description" content="Eldy — a fine dining restaurant in Eldoret, Kenya. Flame-grilled classics, hand-finished plates, and private dining & catering." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #1B120D;
+    --bg-deep: #140D09;
+    --panel: #241A13;
+    --panel-2: #1E140E;
+    --cream: #F3EAD9;
+    --ink: #2B1B12;
+    --wine: #8C2F39;
+    --wine-soft: rgba(140,47,57,0.22);
+    --gold: #C9A227;
+    --gold-soft: rgba(201,162,39,0.18);
+    --line: rgba(237,226,208,0.14);
+    --line-soft: rgba(237,226,208,0.07);
+    --text: #EDE2D0;
+    --text-dim: #B7A58E;
+    --text-faint: #7A6A57;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 80% -10%, #34201A 0%, var(--bg) 50%),
+      var(--bg);
+    color: var(--text);
+    font-family:'Inter', sans-serif;
+    font-size:16px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  h1,h2,h3,h4,.display{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    line-height:1.1;
+    margin:0;
+    letter-spacing:0.002em;
+  }
+  p{ margin:0; }
+  a{ color:inherit; text-decoration:none; }
+  ul{ margin:0; padding:0; list-style:none; }
+  button{ font-family:inherit; }
+  ::selection{ background: var(--gold); color:#1B120D; }
+  :focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+
+  .wrap{ max-width:1160px; margin:0 auto; padding:0 clamp(20px,5vw,56px); position:relative; z-index:2; }
+
+  /* ---------- persistent background: embers & steam ---------- */
+  #emberCanvas{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    width:100%; height:100%;
+  }
+
+  .folio{
+    display:flex; align-items:center; gap:14px;
+    font-family:'Cormorant Garamond', serif; font-style: italic;
+    font-size:15px; color: var(--gold); margin-bottom:18px;
+  }
+  .folio::after{ content:""; flex:1; height:1px; background: var(--line); }
+
+  /* ---------- top nav ---------- */
+  header.site-nav{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background: rgba(20,13,9,0.86);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--line-soft);
+  }
+  .nav-inner{
+    max-width:1160px; margin:0 auto; padding:0 clamp(20px,5vw,56px);
+    height:76px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{ display:flex; align-items:center; gap:12px; cursor:pointer; }
+  .mark{
+    width:36px; height:36px; border:1px solid var(--gold); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cormorant Garamond', serif; font-weight:700; font-size:16px; color: var(--gold);
+  }
+  .brand-text{ line-height:1.2; }
+  .brand-text strong{ font-family:'Cormorant Garamond', serif; font-size:21px; display:block; font-weight:700; letter-spacing:0.02em; }
+  .brand-text span{ font-size:11px; color: var(--text-faint); }
+
+  nav.links{ display:flex; gap:4px; align-items:center; }
+  nav.links button{
+    background:none; border:none; cursor:pointer;
+    color: var(--text-dim); font-size:14.5px; padding:9px 16px; position:relative;
+    transition: color .2s ease;
+  }
+  nav.links button:hover{ color: var(--text); }
+  nav.links button.active{ color: var(--text); }
+  nav.links button.active::after{
+    content:""; position:absolute; left:16px; right:16px; bottom:2px; height:2px; background: var(--gold);
+  }
+  .nav-cta{ border:1px solid var(--gold) !important; color: var(--gold) !important; margin-left:10px; }
+  .nav-cta:hover{ background: var(--gold) !important; color:#1B120D !important; }
+
+  .hamburger{
+    display:none; background:none; border:1px solid var(--line);
+    width:40px; height:40px; cursor:pointer; position:relative;
+  }
+  .hamburger span, .hamburger span::before, .hamburger span::after{
+    content:""; position:absolute; left:10px; right:10px; height:1px; background: var(--text);
+  }
+  .hamburger span{ top:19px; }
+  .hamburger span::before{ top:-6px; }
+  .hamburger span::after{ top:6px; }
+
+  /* ---------- page shell / transitions ---------- */
+  main{ margin-top:76px; position:relative; z-index:1; }
+  .page{ display:none; min-height:calc(100vh - 76px); padding-bottom:90px; }
+  .page.active{ display:block; }
+  .page.enter{ animation: pageIn .6s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes pageIn{
+    from{ opacity:0; transform: perspective(1200px) rotateX(3deg) translateY(20px); }
+    to{ opacity:1; transform: perspective(1200px) rotateX(0) translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce){ .page.enter{ animation:none; } html{ scroll-behavior:auto; } }
+
+  section{ padding: clamp(60px,8vw,100px) 0; }
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end; gap:24px;
+    margin-bottom:44px; border-bottom:1px solid var(--line); padding-bottom:18px;
+  }
+  .section-head h2{ font-size: clamp(30px,3.8vw,42px); }
+  .section-head .idx{ font-size:14px; color: var(--text-faint); white-space:nowrap; padding-bottom:5px; font-family:'Cormorant Garamond',serif; font-style:italic; }
+
+  /* ================= HOME / HERO ================= */
+  .hero{
+    padding-top: clamp(46px,8vw,80px);
+    display:grid; grid-template-columns: 1fr 0.9fr; gap:44px; align-items:center;
+  }
+  .hero-copy h1{ font-size: clamp(40px,5.6vw,64px); color: var(--text); }
+  .hero-copy h1 em{ font-style:italic; color: var(--gold); }
+  .hero-copy .pitch{ margin-top:22px; max-width:50ch; color: var(--text-dim); font-size:17px; }
+  .hero-actions{ margin-top:32px; display:flex; gap:14px; flex-wrap:wrap; }
+  .btn{
+    font-family:'Cormorant Garamond', serif; font-weight:600; font-size:16px; padding:13px 26px;
+    border:1px solid var(--line); cursor:pointer; background:transparent; color: var(--text);
+    transition: border-color .2s ease, transform .2s ease, background .2s ease, color .2s ease;
+  }
+  .btn-primary{ background: var(--gold); border-color: var(--gold); color:#1B120D; }
+  .btn-primary:hover{ transform: translateY(-2px); }
+  .btn-ghost:hover{ border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+
+  .hero-stats{
+    margin-top:48px; display:grid; grid-template-columns: repeat(4,1fr);
+    border-top:1px solid var(--line); padding-top:22px; gap:10px;
+  }
+  .stat b{ display:block; font-family:'Cormorant Garamond',serif; font-size:clamp(22px,2.6vw,28px); color: var(--gold); }
+  .stat span{ font-size:12px; color: var(--text-faint); }
+
+  .plate-stage{ position:relative; height: clamp(320px,42vw,480px); }
+  .plate-stage canvas{ width:100%; height:100%; display:block; }
+  .plate-caption{ position:absolute; bottom:6px; left:6px; font-size:12.5px; color: var(--text-faint); font-family:'Cormorant Garamond',serif; font-style:italic; }
+
+  .feature-strip{
+    margin-top:70px; border-top:1px solid var(--line); padding-top:40px;
+    display:grid; grid-template-columns: repeat(4,1fr); gap:24px;
+  }
+  .feature-item h4{ font-size:19px; margin-bottom:8px; }
+  .feature-item p{ font-size:14px; color: var(--text-dim); }
+
+  /* ================= CARD PRIMITIVES ================= */
+  .card{
+    background: linear-gradient(180deg, var(--panel), var(--bg-deep));
+    border:1px solid var(--line); padding:28px; position:relative;
+    transition: transform .25s ease, border-color .25s ease; will-change: transform;
+  }
+  .card:hover{ border-color: rgba(201,162,39,0.5); }
+
+  /* kitchen teaser (home) */
+  .kitchen-teaser{
+    margin-top:80px; display:flex; justify-content:space-between; align-items:center;
+    border-top:1px solid var(--line); padding-top:40px; flex-wrap:wrap; gap:20px;
+  }
+  .kitchen-names{ display:flex; gap:34px; flex-wrap:wrap; }
+  .kitchen-names div span{ display:block; font-size:12px; color: var(--text-faint); }
+  .kitchen-names div b{ font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; }
+  .link-more{ font-family:'Cormorant Garamond',serif; font-style:italic; color: var(--gold); font-size:15px; cursor:pointer; }
+  .link-more:hover{ text-decoration: underline; }
+
+  /* ================= ABOUT ================= */
+  .about-grid{ display:grid; grid-template-columns: 0.95fr 1.05fr; gap:56px; }
+  .about-lede p{ color: var(--text-dim); margin-bottom:16px; font-size:16.5px; }
+  .about-lede p:first-child{
+    font-size:20px; color: var(--text); font-family:'Cormorant Garamond',serif; font-weight:500; line-height:1.5; font-style:italic;
+  }
+  .about-values{ margin-top:26px; display:flex; flex-wrap:wrap; gap:10px; }
+  .about-values span{ border:1px solid var(--line); padding:7px 15px; font-size:13px; color: var(--text-dim); }
+
+  .subhead{ font-size:14px; color: var(--text-faint); margin:56px 0 22px; padding-top:26px; border-top:1px solid var(--line); font-family:'Cormorant Garamond',serif; font-style:italic; }
+
+  .chef-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:20px; perspective:1000px; }
+  .chef-card{ transform: rotateX(var(--ry,0deg)) rotateY(var(--rx,0deg)); }
+  .chef-card .role{ font-size:12px; color: var(--gold); font-family:'Cormorant Garamond',serif; font-style:italic; }
+  .chef-card h4{ font-size:21px; margin:8px 0 12px; }
+  .chef-card p{ font-size:14px; color: var(--text-dim); }
+
+  .catering-panel{
+    margin-top:56px; padding: 40px clamp(24px,4vw,48px);
+    background: linear-gradient(135deg, var(--wine-soft), transparent 60%), var(--panel-2);
+    border:1px solid var(--line);
+    display:grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px; align-items:center;
+  }
+  .catering-panel h3{ font-size: clamp(24px,3vw,30px); margin-bottom:14px; }
+  .catering-panel p{ color: var(--text-dim); font-size:15px; max-width: 52ch; }
+  .catering-panel .btn{ margin-top:20px; }
+
+  .notice{ margin-top:36px; padding:16px 18px; border:1px solid var(--line); font-size:13px; color: var(--text-faint); }
+
+  /* ================= MENU ================= */
+  .menu-intro{ max-width: 60ch; color: var(--text-dim); font-size:16.5px; margin-bottom: 50px; }
+  .menu-columns{ display:grid; grid-template-columns: repeat(3,1fr); gap: 40px; }
+  .menu-cat h3{ font-size: 24px; color: var(--gold); margin-bottom: 20px; padding-bottom:14px; border-bottom: 1px solid var(--line); }
+  .menu-item{ padding: 14px 0; border-bottom: 1px dashed var(--line-soft); }
+  .menu-item:last-child{ border-bottom:none; }
+  .menu-item .dish{ font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; color: var(--text); }
+  .menu-item .note{ font-size:13.5px; color: var(--text-dim); margin-top:4px; font-style:italic; }
+  .menu-close{ text-align:center; margin-top: 56px; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:19px; color: var(--text-dim); }
+
+  /* ================= CONTACT ================= */
+  .contact-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:56px; }
+  .contact-list{ margin-top:28px; }
+  .contact-list li{ display:flex; justify-content:space-between; padding:16px 0; border-bottom:1px solid var(--line); font-size:15px; gap:14px; }
+  .contact-list li span:first-child{ color: var(--text-faint); font-size:13.5px; white-space:nowrap; }
+  .contact-list li a, .contact-list li span:last-child{ color: var(--text); text-align:right; }
+  .contact-list li a:hover{ color: var(--gold); }
+
+  .field{ margin-bottom:18px; }
+  .field label{ display:block; font-size:13px; color: var(--text-faint); margin-bottom:8px; }
+  .field input, .field select, .field textarea{
+    width:100%; background: var(--bg-deep); border:1px solid var(--line); color: var(--text);
+    padding:12px 14px; font-family:'Inter',sans-serif; font-size:14.5px; resize:vertical;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{ border-color: var(--gold); outline:none; }
+  .form-msg{ font-size:13px; color: var(--gold); margin-top:10px; min-height:16px; }
+
+  footer{ border-top:1px solid var(--line); padding: 46px 0 30px; position:relative; z-index:1; }
+  .footer-grid{ display:grid; grid-template-columns: 1.3fr 1fr 1fr; gap:32px; margin-bottom:32px; }
+  .footer-grid h5{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:15px; color: var(--gold); margin-bottom:14px; font-weight:500; }
+  .footer-grid li{ font-size:13.5px; color: var(--text-dim); padding:5px 0; }
+  .footer-grid a:hover{ color: var(--gold); }
+  .footer-bottom{
+    border-top:1px solid var(--line); padding-top:20px;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    font-size:12.5px; color: var(--text-faint);
+  }
+  .footer-bottom a{ color: var(--text-dim); }
+  .footer-bottom a:hover{ color: var(--gold); }
+
+  @media (max-width:900px){
+    nav.links{
+      position:fixed; top:76px; left:0; right:0; background: var(--bg-deep);
+      border-bottom:1px solid var(--line); flex-direction:column; align-items:stretch;
+      padding:10px 20px 20px; display:none;
+    }
+    nav.links.open{ display:flex; }
+    nav.links button{ text-align:left; padding:13px 4px; border-bottom:1px solid var(--line-soft); }
+    .nav-cta{ margin:10px 0 0; text-align:center; }
+    .hamburger{ display:block; }
+
+    .hero{ grid-template-columns:1fr; }
+    .hero-stats{ grid-template-columns: repeat(2,1fr); row-gap:22px; }
+    .feature-strip{ grid-template-columns: 1fr 1fr; }
+    .about-grid, .contact-grid, .catering-panel{ grid-template-columns:1fr; }
+    .chef-grid, .menu-columns{ grid-template-columns: 1fr; }
+    .footer-grid{ grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width:560px){
+    .feature-strip{ grid-template-columns: 1fr; }
+    .footer-grid{ grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="emberCanvas"></canvas>
+
+<header class="site-nav">
+  <div class="nav-inner">
+    <div class="brand" data-nav="home">
+      <div class="mark">E</div>
+      <div class="brand-text">
+        <strong>Eldy</strong>
+        <span>Eldoret Inspired Fine Dining</span>
+      </div>
+    </div>
+    <nav class="links" id="navLinks">
+      <button data-nav="home" class="active">Home</button>
+      <button data-nav="menu">Menu</button>
+      <button data-nav="about">About</button>
+      <button data-nav="contact" class="nav-cta">Reserve</button>
+    </nav>
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation"><span></span></button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= HOME ================= -->
+  <section class="page active" id="page-home" data-page="home">
+    <div class="wrap">
+      <div class="hero">
+        <div class="hero-copy">
+          <p class="folio">Eldoret, Kenya</p>
+          <h1>A table set for something <em>extraordinary</em>.</h1>
+          <p class="pitch">Eldy blends Eldoret's own flavours with the discipline of a classic kitchen — flame-grilled meats, hand-finished plates, and a wine list chosen to match. Every dish is cooked to order and brought to a table meant to be lingered at.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" data-nav="contact">Reserve a table</button>
+            <button class="btn btn-ghost" data-nav="menu">View the menu</button>
+          </div>
+          <div class="hero-stats">
+            <div class="stat"><b>3</b><span>Chefs in the kitchen</span></div>
+            <div class="stat"><b>À la carte</b><span>Cooked to order</span></div>
+            <div class="stat"><b>Open</b><span>Kitchen concept</span></div>
+            <div class="stat"><b>Private</b><span>Dining &amp; catering</span></div>
+          </div>
+        </div>
+
+        <div class="plate-stage" id="plateStage" aria-hidden="true">
+          <canvas id="plateCanvas"></canvas>
+          <p class="plate-caption">Set for service, every evening.</p>
+        </div>
+      </div>
+
+      <div class="feature-strip">
+        <div class="feature-item"><h4>Cooked to order</h4><p>Nothing pre-plated — every dish fired the moment you order it.</p></div>
+        <div class="feature-item"><h4>Sourced each morning</h4><p>Produce and meat brought in fresh from Eldoret's local suppliers.</p></div>
+        <div class="feature-item"><h4>Classically trained</h4><p>A kitchen led by classically trained and Kenyan-cuisine specialists.</p></div>
+        <div class="feature-item"><h4>Catering, on request</h4><p>From intimate dinners to full events — our kitchen travels too.</p></div>
+      </div>
+
+      <div class="kitchen-teaser">
+        <div class="kitchen-names">
+          <div><b>Liz Grisaitis</b><span>Executive Chef</span></div>
+          <div><b>Nancy Koech</b><span>Chef de Cuisine</span></div>
+          <div><b>Phillip Kolale</b><span>Pastry Chef</span></div>
+        </div>
+        <span class="link-more" data-nav="about">Meet the kitchen →</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MENU ================= -->
+  <section class="page" id="page-menu" data-page="menu">
+    <div class="wrap">
+      <div class="section-head"><h2>The Menu</h2><span class="idx">Tonight's selection</span></div>
+      <p class="menu-intro">Our mission is simple — serve delicious, considered food that guests want to return to, week after week. The kitchen changes with the season, so treat this as a taste of what's cooking rather than the final word.</p>
+
+      <div class="menu-columns">
+        <div class="menu-cat">
+          <h3>Appetisers</h3>
+          <div class="menu-item"><div class="dish">Oats</div><div class="note">warm, spiced, finished with honey</div></div>
+          <div class="menu-item"><div class="dish">Protein Shakes</div><div class="note">house-blended, chilled to order</div></div>
+          <div class="menu-item"><div class="dish">Nut Butter</div><div class="note">served with toasted flatbread</div></div>
+          <div class="menu-item"><div class="dish">Whole Grains</div><div class="note">a light, savoury bowl to start</div></div>
+          <div class="menu-item"><div class="dish">Berries</div><div class="note">seasonal, lightly sugared</div></div>
+          <div class="menu-item"><div class="dish">Quiche</div><div class="note">flaky pastry, a savoury classic</div></div>
+        </div>
+        <div class="menu-cat">
+          <h3>Main Course</h3>
+          <div class="menu-item"><div class="dish">Fried Rice</div><div class="note">wok-tossed with vegetables and spice</div></div>
+          <div class="menu-item"><div class="dish">Nyama Choma</div><div class="note">flame-grilled over charcoal, kachumbari on the side</div></div>
+          <div class="menu-item"><div class="dish">Mashed Potatoes &amp; Peas Stew</div><div class="note">buttery, slow-simmered comfort</div></div>
+          <div class="menu-item"><div class="dish">Mukimo</div><div class="note">the Kenyan classic, mashed and folded with greens</div></div>
+          <div class="menu-item"><div class="dish">Bhajias</div><div class="note">crisp-fried, spiced, served hot</div></div>
+          <div class="menu-item"><div class="dish">Matoke</div><div class="note">green bananas, stewed low and slow</div></div>
+          <div class="menu-item"><div class="dish">Kenyan Style Stew</div><div class="note">rich, home-style, deeply spiced</div></div>
+          <div class="menu-item"><div class="dish">Fish</div><div class="note">pan-seared, market catch of the day</div></div>
+          <div class="menu-item"><div class="dish">Omelet &amp; French Fries</div><div class="note">a simple plate, done properly</div></div>
+        </div>
+        <div class="menu-cat">
+          <h3>Dessert</h3>
+          <div class="menu-item"><div class="dish">Black Forest Cake</div><div class="note">layered chocolate sponge and cherry</div></div>
+          <div class="menu-item"><div class="dish">Marzipan Cake</div><div class="note">almond-rich, delicately iced</div></div>
+          <div class="menu-item"><div class="dish">Pumpkin Lemonade Scones</div><div class="note">warm, citrus-bright</div></div>
+          <div class="menu-item"><div class="dish">Prunes</div><div class="note">lightly stewed, served chilled</div></div>
+          <div class="menu-item"><div class="dish">Bananas</div><div class="note">caramelised to order</div></div>
+          <div class="menu-item"><div class="dish">Fruit Salad</div><div class="note">a bright, seasonal finish</div></div>
+        </div>
+      </div>
+
+      <p class="menu-close">...and the list goes on. Come taste the rest, at the table.</p>
+      <p class="notice">Dish descriptions here are placeholder copy — swap in your real seasonal menu and pricing before publishing.</p>
+    </div>
+  </section>
+
+  <!-- ================= ABOUT ================= -->
+  <section class="page" id="page-about" data-page="about">
+    <div class="wrap">
+      <div class="section-head"><h2>About Eldy</h2><span class="idx">Our story</span></div>
+
+      <div class="about-grid">
+        <div class="about-lede">
+          <p>Eldy opened with one idea: that Eldoret deserved a table as considered as anywhere else.</p>
+          <p>We cook Kenyan classics alongside kitchen staples, treating both with the same care — flame-grilled nyama choma next to a pan-seared catch of the day, mukimo plated with the same attention as a layered cake.</p>
+          <p>The dining room is warm and unhurried: an open kitchen, low light, linen on every table. We want you to stay for the second glass of wine.</p>
+          <p>Everything is sourced close to home. Produce and meat come in fresh each morning, and the menu shifts with what the season gives us.</p>
+          <div class="about-values">
+            <span>Flame-grilled</span><span>Hand-plated</span><span>Locally sourced</span><span>Seasonal</span><span>Unhurried</span>
+          </div>
+        </div>
+        <div class="about-visual">
+          <p class="folio">Philosophy</p>
+          <p style="color:var(--text-dim); font-size:15.5px; margin-bottom:28px;">Every plate should hit that elusive, cuisine-defining balance — sweet, salty, sour, and something worth savouring. We'd rather do fewer dishes well than a long menu of average ones.</p>
+          <p class="folio">Ambience</p>
+          <p style="color:var(--text-dim); font-size:15.5px;">Soft light, an open kitchen you can watch service from, and tables built for lingering — Eldy is built for the evenings you don't want to rush.</p>
+        </div>
+      </div>
+
+      <p class="subhead">The kitchen</p>
+      <div class="chef-grid">
+        <div class="card chef-card"><span class="role">Executive Chef</span><h4>Liz Grisaitis</h4><p>Sets the kitchen's direction — from the seasonal menu to what leaves the pass each night.</p></div>
+        <div class="card chef-card"><span class="role">Chef de Cuisine</span><h4>Nancy Koech</h4><p>Runs the line and the nightly service, keeping every plate consistent, table after table.</p></div>
+        <div class="card chef-card"><span class="role">Pastry Chef</span><h4>Phillip Kolale</h4><p>Handles the dessert menu end to end — from the morning bakes to the final plated course.</p></div>
+      </div>
+
+      <div class="catering-panel">
+        <div>
+          <h3>Private dining &amp; catering</h3>
+          <p>Hosting a wedding, a corporate dinner, or something smaller? Eldy's kitchen travels — full-service catering, chefs on site, and a menu tailored to your event, from canapés to a plated five-course dinner.</p>
+          <button class="btn btn-primary" data-nav="contact">Enquire about catering</button>
+        </div>
+        <div style="font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--text-dim); font-size:15px;">"We wanted our reception to feel like our favourite dinner out — Eldy made that happen, at our venue, from start to service."</div>
+      </div>
+
+      <p class="notice">Chef bios and the quote above are placeholder content for the template — replace with real details before publishing.</p>
+    </div>
+  </section>
+
+  <!-- ================= CONTACT ================= -->
+  <section class="page" id="page-contact" data-page="contact">
+    <div class="wrap">
+      <div class="section-head"><h2>Reserve a Table</h2><span class="idx">Get in touch</span></div>
+
+      <div class="contact-grid">
+        <div>
+          <p style="max-width:44ch; color:var(--text-dim); font-size:16.5px;">For reservations, private dining, or catering enquiries — reach us directly, or send a message and we'll get back to you.</p>
+
+          <ul class="contact-list">
+            <li><span>Address</span><span>P.O. Box 7717-30100, Eldoret, Kenya</span></li>
+            <li><span>Phone</span><a href="tel:+254707385519">+254 707 385 519</a></li>
+            <li><span>Email</span><a href="mailto:eldyfoods@outlook.com">eldyfoods@outlook.com</a></li>
+            <li><span>Dinner service</span><span>Tue–Sun, 12:00 – 22:00</span></li>
+          </ul>
+
+          <div class="notice">Service hours above are a placeholder — update with Eldy's real opening times.</div>
+        </div>
+
+        <div>
+          <form id="contactForm">
+            <div class="field">
+              <label for="cf-name">Name</label>
+              <input id="cf-name" type="text" required placeholder="Your full name">
+            </div>
+            <div class="field">
+              <label for="cf-email">Email</label>
+              <input id="cf-email" type="email" required placeholder="you@example.com">
+            </div>
+            <div class="field">
+              <label for="cf-reason">This is about</label>
+              <select id="cf-reason">
+                <option>Table reservation</option>
+                <option>Private dining</option>
+                <option>Catering enquiry</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="cf-message">Message</label>
+              <textarea id="cf-message" rows="5" required placeholder="Party size, date, and anything we should know"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send request</button>
+            <p class="form-msg" id="formMsg"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <h5>Eldy</h5>
+        <p style="font-size:13.5px; color:var(--text-dim); max-width:32ch;">Eldoret inspired fine dining — flame-grilled classics, hand-finished plates, private dining &amp; catering.</p>
+      </div>
+      <div>
+        <h5>Quick Links</h5>
+        <ul>
+          <li><a href="#" data-nav="home">Home</a></li>
+          <li><a href="#" data-nav="menu">Menu</a></li>
+          <li><a href="#" data-nav="about">About</a></li>
+          <li><a href="#" data-nav="contact">Reserve</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Find Us</h5>
+        <ul>
+          <li>P.O. Box 7717-30100, Eldoret</li>
+          <li>+254 707 385 519</li>
+          <li>eldyfoods@outlook.com</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Eldy.</span>
+      <span>Site by <a href="https://phillipkolale.github.io/apluswebsiteandgraphicsdevelopers/Home.html" target="_blank" rel="noopener">A+ Website &amp; Graphics Developers</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------------- Navigation ---------------- */
+  const pages = document.querySelectorAll('.page');
+  const navLinks = document.getElementById('navLinks');
+  const hamburger = document.getElementById('hamburger');
+
+  function goTo(name){
+    document.querySelectorAll('#navLinks button').forEach(b => b.classList.toggle('active', b.dataset.nav === name));
+    pages.forEach(p => {
+      if(p.dataset.page === name){
+        p.classList.add('active'); p.classList.remove('enter');
+        void p.offsetWidth; p.classList.add('enter');
+      } else { p.classList.remove('active'); }
+    });
+    navLinks.classList.remove('open');
+    window.scrollTo({top:0});
+  }
+  document.querySelectorAll('[data-nav]').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); goTo(btn.dataset.nav); }));
+  hamburger.addEventListener('click', () => navLinks.classList.toggle('open'));
+
+  function applyTilt(card){
+    if(reduceMotion) return;
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      card.style.setProperty('--rx', (x * 8).toFixed(2) + 'deg');
+      card.style.setProperty('--ry', (-y * 8).toFixed(2) + 'deg');
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.setProperty('--rx', '0deg'); card.style.setProperty('--ry', '0deg');
+    });
+  }
+  document.querySelectorAll('.chef-card').forEach(applyTilt);
+
+  /* ---------------- Contact form (mailto) ---------------- */
+  document.getElementById('contactForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const name = document.getElementById('cf-name').value;
+    const email = document.getElementById('cf-email').value;
+    const reason = document.getElementById('cf-reason').value;
+    const message = document.getElementById('cf-message').value;
+    const body = `From: ${name} (${email})\nReason: ${reason}\n\n${message}`;
+    window.location.href = `mailto:eldyfoods@outlook.com?subject=${encodeURIComponent(reason)}&body=${encodeURIComponent(body)}`;
+    document.getElementById('formMsg').textContent = 'Opening your email client…';
+  });
+
+  /* ================= Persistent background: embers & steam (catering theme) ================= */
+  (function(){
+    const canvas = document.getElementById('emberCanvas');
+    const ctx = canvas.getContext('2d');
+    let w, h, dpr;
+
+    function resize(){
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth; h = window.innerHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // small rising embers
+    const EMBER_COUNT = 42;
+    const embers = Array.from({length: EMBER_COUNT}, () => ({
+      x: Math.random()*w,
+      y: h + Math.random()*h,
+      r: 1 + Math.random()*2.2,
+      speed: 0.15 + Math.random()*0.35,
+      drift: (Math.random()-0.5)*0.3,
+      alpha: 0.25 + Math.random()*0.4,
+      hue: Math.random() > 0.5 ? '201,162,39' : '140,47,57'
+    }));
+
+    // soft steam wisps
+    const WISP_COUNT = 6;
+    const wisps = Array.from({length: WISP_COUNT}, () => ({
+      x: Math.random()*w,
+      y: h + Math.random()*300,
+      r: 60 + Math.random()*80,
+      speed: 0.08 + Math.random()*0.1,
+      alpha: 0.03 + Math.random()*0.03
+    }));
+
+    function draw(){
+      ctx.clearRect(0,0,w,h);
+
+      wisps.forEach(s => {
+        s.y -= s.speed;
+        if(s.y < -s.r*2){ s.y = h + s.r; s.x = Math.random()*w; }
+        const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r);
+        grad.addColorStop(0, `rgba(237,226,208,${s.alpha})`);
+        grad.addColorStop(1, 'rgba(237,226,208,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+        ctx.fill();
+      });
+
+      embers.forEach(e => {
+        e.y -= e.speed;
+        e.x += e.drift;
+        if(e.y < -10){ e.y = h + 10; e.x = Math.random()*w; }
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(${e.hue},${e.alpha})`;
+        ctx.arc(e.x, e.y, e.r, 0, Math.PI*2);
+        ctx.fill();
+      });
+
+      if(!reduceMotion){ requestAnimationFrame(draw); }
+    }
+    draw();
+  })();
+
+  /* ================= 3D place setting: plate, crossed cutlery, steam (Three.js hero) ================= */
+  (function(){
+    const stage = document.getElementById('plateStage');
+    const canvas = document.getElementById('plateCanvas');
+    if(!window.THREE || !stage || !canvas) return;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, stage.clientWidth / stage.clientHeight, 0.1, 100);
+    camera.position.set(0, 2.1, 4.6);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(stage.clientWidth, stage.clientHeight);
+
+    const group = new THREE.Group();
+    scene.add(group);
+
+    // plate: two concentric rings, line art
+    const goldMat = new THREE.LineBasicMaterial({ color: 0xC9A227, transparent:true, opacity:0.85 });
+    const goldMatSoft = new THREE.LineBasicMaterial({ color: 0xC9A227, transparent:true, opacity:0.35 });
+
+    function ring(radius, mat){
+      const curve = new THREE.EllipseCurve(0,0, radius, radius, 0, Math.PI*2, false, 0);
+      const pts = curve.getPoints(80).map(p => new THREE.Vector3(p.x, 0, p.y));
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      return new THREE.LineLoop(geo, mat);
+    }
+    group.add(ring(1.5, goldMat));
+    group.add(ring(1.1, goldMatSoft));
+
+    // crossed fork & knife (thin boxes)
+    const cutMat = new THREE.MeshBasicMaterial({ color: 0xF3EAD9 });
+    function utensil(length, tiltZ){
+      const g = new THREE.Group();
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.04, length), cutMat);
+      g.add(handle);
+      g.rotation.z = tiltZ;
+      return g;
+    }
+    const fork = utensil(2.6, Math.PI/10);
+    fork.position.set(-1.05, 0.05, 0);
+    fork.rotation.y = Math.PI/2;
+    group.add(fork);
+
+    const knife = utensil(2.6, -Math.PI/10);
+    knife.position.set(1.05, 0.05, 0);
+    knife.rotation.y = Math.PI/2;
+    group.add(knife);
+
+    group.rotation.x = -0.55;
+
+    // rising steam particles above the plate
+    const PCOUNT = 60;
+    const positions = new Float32Array(PCOUNT * 3);
+    const speeds = new Float32Array(PCOUNT);
+    for(let i=0;i<PCOUNT;i++){
+      const ang = Math.random()*Math.PI*2;
+      const rad = Math.random()*0.8;
+      positions[i*3+0] = Math.cos(ang)*rad;
+      positions[i*3+1] = Math.random()*0.4;
+      positions[i*3+2] = Math.sin(ang)*rad*0.4;
+      speeds[i] = 0.004 + Math.random()*0.008;
+    }
+    const pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const pMat = new THREE.PointsMaterial({ color: 0xF3EAD9, size: 0.04, transparent:true, opacity:0.5 });
+    const steam = new THREE.Points(pGeo, pMat);
+    group.add(steam);
+
+    let raf;
+    function animate(){
+      raf = requestAnimationFrame(animate);
+      if(!reduceMotion){
+        group.rotation.y += 0.0035;
+        const pos = steam.geometry.attributes.position.array;
+        for(let i=0;i<PCOUNT;i++){
+          pos[i*3+1] += speeds[i];
+          if(pos[i*3+1] > 1.8){ pos[i*3+1] = 0; }
+        }
+        steam.geometry.attributes.position.needsUpdate = true;
+      }
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    function onResize(){
+      const w = stage.clientWidth, h = stage.clientHeight;
+      if(!w || !h) return;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+    window.addEventListener('resize', onResize);
+    onResize();
+  })();
+</script>
+</body>
+</html>
